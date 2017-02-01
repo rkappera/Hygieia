@@ -33,7 +33,7 @@ public class FeatureRepositoryImpl implements FeatureRepositoryCustom {
             dateTimeValid = false;
         }
         String queryStr = dateTimeValid 
-                ? "{'isDeleted' : 'False', $and : [{'sSprintID' : {$ne : null}}, {'sSprintID' : {$ne : ''}}, {'sSprintAssetState': { $regex: '^active$', $options: 'i' }}, {'sSprintEndDate' : {$gte : '" + currentISODateTime + "'}}, {'sSprintEndDate' : {$lt : '9999-12-31T59:59:59.999999'}}] }, $orderby: { 'sStatus' :-1 }" 
+                ? "{'isDeleted' : 'False', $and : [{'sSprintID' : {$ne : null}}, {'sSprintID' : {$ne : ''}}, {'sSprintAssetState': { $regex: '^active$', $options: 'i' }}, {'sSprintEndDate' : {$gte : '" + currentISODateTime + "'}}, {'sSprintEndDate' : {$lt : '9999-12-31T59:59:59.999999'}}] }, $orderby: { 'sStatus' :-1 }"
                 : "{'isDeleted' : 'False', $and : [{'sSprintID' : {$ne : null}}, {'sSprintID' : {$ne : ''}}, {'sSprintAssetState': { $regex: '^active$', $options: 'i' }}, {'sSprintEndDate' : {$lt : '9999-12-31T59:59:59.999999'}}] }, $orderby: { 'sStatus' :-1 }";
         BasicQuery query = null;
         if (minimal) {
@@ -45,9 +45,9 @@ public class FeatureRepositoryImpl implements FeatureRepositoryCustom {
         if (collectorId != null) {
             query.addCriteria(Criteria.where("collectorId").is(collectorId));
         }
-        if (!StringUtils.isEmpty(sTeamId) && !FeatureCollectorConstants.TEAM_ID_ANY.equalsIgnoreCase(sTeamId)) {
+        /*if (!StringUtils.isEmpty(sTeamId) && !FeatureCollectorConstants.TEAM_ID_ANY.equalsIgnoreCase(sTeamId)) {
             query.addCriteria(Criteria.where("sTeamID").is(sTeamId));
-        }
+        }*/
         if (!StringUtils.isEmpty(sProjectId) && !FeatureCollectorConstants.PROJECT_ID_ANY.equalsIgnoreCase(sProjectId)) {
             query.addCriteria(Criteria.where("sProjectID").is(sProjectId));
         }

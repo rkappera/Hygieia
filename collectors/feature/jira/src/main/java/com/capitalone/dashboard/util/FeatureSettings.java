@@ -25,7 +25,8 @@ import org.springframework.stereotype.Component;
  * @author KFK884
  */
 @Component
-@ConfigurationProperties(prefix = "feature")
+@ConfigurationProperties(prefix = "feature",locations = "classpath:jira-feature-collector.properties")
+//@ConfigurationProperties(prefix = "feature")
 public class FeatureSettings {
 	private String cron;
 	private int pageSize;
@@ -43,6 +44,7 @@ public class FeatureSettings {
 	private int sprintDays;
 	private int sprintEndPrior;
 	private int scheduledPriorMin;
+
 	// Jira-connection details
 	private String jiraBaseUrl;
 	private String jiraQueryEndpoint;
@@ -330,4 +332,5 @@ public class FeatureSettings {
 	public void setJiraTeamFieldName(String jiraTeamFieldName) {
 		this.jiraTeamFieldName = jiraTeamFieldName;
 	}
+
 }

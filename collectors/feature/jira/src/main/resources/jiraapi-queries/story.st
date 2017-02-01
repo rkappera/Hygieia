@@ -1,1 +1,1 @@
-story(changeDate,issueTypes) ::= "updatedDate>='$changeDate$' AND issueType IN ($issueTypes$) ORDER BY updated ASC"
+story(teamID,changeDate,issueTypes) ::= "project='$teamID$' AND updatedDate>='$changeDate$' AND issueType IN ($issueTypes$) ORDER BY updated ASC"

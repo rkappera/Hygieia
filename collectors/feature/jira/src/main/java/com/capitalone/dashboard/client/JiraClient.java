@@ -8,7 +8,7 @@ import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.capitalone.dashboard.model.Team;
 
 public interface JiraClient {
-	List<Issue> getIssues(long startTime, int pageStart);
+	List<Issue> getIssues(long startTime,String myTeamId, int pageStart);
 	
 	List<BasicProject> getProjects();
 	

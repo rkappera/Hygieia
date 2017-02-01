@@ -52,10 +52,10 @@ public class FeatureCollectorTask extends CollectorTask<FeatureCollector> {
 	 */
 	@Autowired
 	public FeatureCollectorTask(CoreFeatureSettings coreFeatureSettings,
-			TaskScheduler taskScheduler, FeatureRepository featureRepository,
-			ScopeOwnerRepository teamRepository, ScopeRepository projectRepository,
-			FeatureCollectorRepository featureCollectorRepository, FeatureSettings featureSettings,
-			JiraClient jiraClient) {
+								TaskScheduler taskScheduler, FeatureRepository featureRepository,
+								ScopeOwnerRepository teamRepository, ScopeRepository projectRepository,
+								FeatureCollectorRepository featureCollectorRepository, FeatureSettings featureSettings,
+								JiraClient jiraClient) {
 		super(taskScheduler, FeatureCollectorConstants.JIRA);
 		this.featureCollectorRepository = featureCollectorRepository;
 		this.teamRepository = teamRepository;

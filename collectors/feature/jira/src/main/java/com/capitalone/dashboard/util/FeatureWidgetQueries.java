@@ -105,9 +105,10 @@ public class FeatureWidgetQueries {
 	 *            The source system query name (without the file type).
 	 * @return A given source system query, in String format.
 	 */
-	public String getStoryQuery(String changeDatePara, String[] issueTypes, String queryName) {
+	public String getStoryQuery(String changeDatePara, String[] issueTypes, String queryName,String myTeamIdPara) {
 		ST st = folder.getInstanceOf(queryName);
-		st.add("changeDate", changeDatePara);
+		st.add("teamID", myTeamIdPara);
+		st.add("changeDate", String.join(",",changeDatePara));
 		String[] issueTypesQuoted = new String[issueTypes.length];
 		for (int i = 0; i < issueTypes.length; i++) {
 			issueTypesQuoted[i] = "'" + issueTypes[i] + "'";

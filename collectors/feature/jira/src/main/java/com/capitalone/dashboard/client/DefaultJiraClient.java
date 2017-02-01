@@ -61,7 +61,7 @@ public class DefaultJiraClient implements JiraClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJiraClient.class);
 	private static final ClientUtil TOOLS = ClientUtil.getInstance();
 	
-	private static final String TEMPO_TEAMS_REST_SUFFIX = "rest/tempo-teams/1/team";
+	private static final String TEMPO_TEAMS_REST_SUFFIX = "rest/api/2/project";
 	
 	private final DateFormat QUERY_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	
@@ -83,16 +83,16 @@ public class DefaultJiraClient implements JiraClient {
 	}
 	
 	@Override
-	public List<Issue> getIssues(long startTime, int pageStart) {
+	public List<Issue> getIssues(long startTime,String myTeamId, int pageStart) {
 		List<Issue> rt = new ArrayList<>();
 		
 		if (client != null) {
 			try {
 				// example "1900-01-01 00:00"
 				String startDateStr = QUERY_DATE_FORMAT.format(new Date(startTime));
-				
+				LOGGER.info("startDateStr = "+startDateStr);
 				String query = featureWidgetQueries.getStoryQuery(startDateStr,
-						featureSettings.getJiraIssueTypeNames(), featureSettings.getStoryQuery());
+						featureSettings.getJiraIssueTypeNames(), featureSettings.getStoryQuery(),myTeamId);
 				
 				Promise<SearchResult> promisedRs = client.getSearchClient().searchJql(
 						query, featureSettings.getPageSize(), pageStart, DEFAULT_FIELDS);

@@ -132,7 +132,9 @@ public class StoryDataClientImpl implements StoryDataClient {
 		epicCache.clear(); // just in case class is made static w/ spring in future
 		
 		//long startDate = featureCollectorRepository.findByName(FeatureCollectorConstants.JIRA).getLastExecuted();
-		
+		//String myTeamId = "26205";
+		String myTeamId = "26205";
+
 		String startDateStr = featureSettings.getDeltaStartDate();
 		String maxChangeDate = getMaxChangeDate();
 		if (maxChangeDate != null) {
@@ -157,7 +159,7 @@ public class StoryDataClientImpl implements StoryDataClient {
 				LOGGER.debug("Obtaining story information starting at index " + i + "...");
 			}
 			long queryStart = System.currentTimeMillis();
-			List<Issue> issues = jiraClient.getIssues(startTime, i);
+			List<Issue> issues = jiraClient.getIssues(startTime,myTeamId, i);
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Story information query took " + (System.currentTimeMillis() - queryStart) + " ms");
 			}
@@ -215,7 +217,7 @@ public class StoryDataClientImpl implements StoryDataClient {
 				User assignee = issue.getAssignee();
 				IssueField epic = fields.get(featureSettings.getJiraEpicIdFieldName());
 				IssueField sprint = fields.get(featureSettings.getJiraSprintDataFieldName());
-				
+
 				if (issueTypeNames.contains(TOOLS.sanitizeResponse(issueType.getName()).toLowerCase(Locale.getDefault()))) {
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug(String.format("[%-12s] %s", 
