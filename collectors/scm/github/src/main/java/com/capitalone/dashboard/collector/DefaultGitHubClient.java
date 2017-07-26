@@ -6,7 +6,6 @@ import com.capitalone.dashboard.model.GitHubRepo;
 import com.capitalone.dashboard.util.Encryption;
 import com.capitalone.dashboard.util.EncryptionException;
 import com.capitalone.dashboard.util.Supplier;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,13 +25,13 @@ import org.springframework.web.client.RestOperations;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
+
 
 /**
  * GitHubClient implementation that uses SVNKit to fetch information about
@@ -87,7 +86,7 @@ public class DefaultGitHubClient implements GitHubClient {
 			apiUrl = protocol + "://" + PUBLIC_GITHUB_REPO_HOST + repoName;
 		} else {
 			apiUrl = protocol + "://" + hostName + SEGMENT_API + repoName;
-			LOG.debug("API URL IS:"+apiUrl);
+			LOG.debug("API URL IS:" + apiUrl);
 		}
 		Date dt;
 		if (firstRun) {
@@ -99,6 +98,7 @@ public class DefaultGitHubClient implements GitHubClient {
 			}
 		} else {
 			dt = getDate(new Date(repo.getLastUpdated()), 0, -10);
+			LOG.info("The dt value calculated base don getLastUpdated is: "+ dt);
 		}
 		Calendar calendar = new GregorianCalendar();
 		TimeZone timeZone = calendar.getTimeZone();
@@ -115,10 +115,23 @@ public class DefaultGitHubClient implements GitHubClient {
 
 		// decrypt password
 		String decryptedPassword = "";
-		if (repo.getPassword() != null && !repo.getPassword().isEmpty()) {
+		LOG.info("The URL is: " + queryUrl);
+		repo.setUserId("rkappera");
+		String repoPassword = "";
+		String encryptKey="";
+		try {
+			encryptKey = Encryption.getStringKey();
+			repoPassword = repo.setPassword(Encryption.encryptString("7daysin@Week", encryptKey));
+		} catch (EncryptionException e) {
+			LOG.error(e.getMessage());
+		}
+
+		LOG.info("The PASSWORD is: " + repoPassword);
+		if (repoPassword != null && !repo.getPassword().isEmpty()) {
 			try {
 				decryptedPassword = Encryption.decryptString(
-						repo.getPassword(), settings.getKey());
+						repoPassword, encryptKey);
+				LOG.info("The decrypted password is "+ decryptedPassword);
 			} catch (EncryptionException e) {
 				LOG.error(e.getMessage());
 			}
@@ -128,7 +141,7 @@ public class DefaultGitHubClient implements GitHubClient {
 		String queryUrlPage = queryUrl;
 		while (!lastPage) {
 			try {
-				ResponseEntity<String> response = makeRestCall(queryUrlPage, repo.getUserId(), decryptedPassword);
+				ResponseEntity<String> response = makeRestCall(queryUrlPage);
 				JSONArray jsonArray = paresAsArray(response);
 				for (Object item : jsonArray) {
 					JSONObject jsonObject = (JSONObject) item;
@@ -139,25 +152,25 @@ public class DefaultGitHubClient implements GitHubClient {
 					String author = str(authorObject, "name");
 					long timestamp = new DateTime(str(authorObject, "date"))
 							.getMillis();
-                    JSONArray parents = (JSONArray) jsonObject.get("parents");
+					JSONArray parents = (JSONArray) jsonObject.get("parents");
 					List<String> parentShas = new ArrayList<>();
 					if (parents != null) {
 						for (Object parentObj : parents) {
-							parentShas.add(str((JSONObject)parentObj, "sha"));
+							parentShas.add(str((JSONObject) parentObj, "sha"));
 						}
 					}
-                    
+
 					Commit commit = new Commit();
 					commit.setTimestamp(System.currentTimeMillis());
 					commit.setScmUrl(repo.getRepoUrl());
-                    commit.setScmBranch(repo.getBranch());
+					commit.setScmBranch(repo.getBranch());
 					commit.setScmRevisionNumber(sha);
 					commit.setScmParentRevisionNumbers(parentShas);
 					commit.setScmAuthor(author);
 					commit.setScmCommitLog(message);
 					commit.setScmCommitTimestamp(timestamp);
 					commit.setNumberOfChanges(1);
-                    commit.setType(getCommitType(CollectionUtils.size(parents), message));
+					commit.setType(getCommitType(CollectionUtils.size(parents), message));
 					commits.add(commit);
 				}
 				if (CollectionUtils.isEmpty(jsonArray)) {
@@ -212,12 +225,11 @@ public class DefaultGitHubClient implements GitHubClient {
 		return true;
 	}
 
-	private ResponseEntity<String> makeRestCall(String url, String userId,
-			String password) {
+	private ResponseEntity<String> makeRestCall(String url) {
 		// Basic Auth only.
-		if (!"".equals(userId) && !"".equals(password)) {
+		if (settings.getAuthCredentials()!= null && !settings.getAuthCredentials().isEmpty()){
 			return restOperations.exchange(url, HttpMethod.GET,
-					new HttpEntity<>(createHeaders(userId, password)),
+					new HttpEntity<>(createHeaders()),
 					String.class);
 
 		} else {
@@ -227,11 +239,8 @@ public class DefaultGitHubClient implements GitHubClient {
 
 	}
 
-	private HttpHeaders createHeaders(final String userId, final String password) {
-		String auth = userId + ":" + password;
-		byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.US_ASCII));
-		String authHeader = "Basic " + new String(encodedAuth);
-
+	private HttpHeaders createHeaders() {
+		String authHeader = "Basic " + settings.getAuthCredentials();
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", authHeader);
 		return headers;

@@ -7,14 +7,22 @@ import org.springframework.stereotype.Component;
  * Bean to hold settings specific to the UDeploy collector.
  */
 @Component
-@ConfigurationProperties(prefix = "github")
+@ConfigurationProperties(prefix = "github",locations = "classpath:github-scm-collector.properties")
 public class GitHubSettings {
     private String cron;
     private String host;
+	private String authCredentials;
     private String key;
     private int firstRunHistoryDays;
     private String[] notBuiltCommits;
 
+	public String getAuthCredentials() {
+		return authCredentials;
+	}
+
+	public void setAuthCredentials(String authCredentials) {
+		this.authCredentials = authCredentials;
+	}
 
 	public String getHost() {
 		return host;
@@ -23,6 +31,7 @@ public class GitHubSettings {
 	public void setHost(String host) {
 		this.host = host;
 	}
+
 
 	public String getCron() {
         return cron;
@@ -55,4 +64,5 @@ public class GitHubSettings {
     public void setNotBuiltCommits(String[] notBuiltCommits) {
         this.notBuiltCommits = notBuiltCommits;
     }
+
 }

@@ -24,8 +24,9 @@ public class GitHubRepo extends CollectorItem {
         return (String) getOptions().get(PASSWORD);
     }
 
-    public void setPassword(String password) {
+    public String setPassword(String password) {
         getOptions().put(PASSWORD, password);
+        return password;
     }
     
     
