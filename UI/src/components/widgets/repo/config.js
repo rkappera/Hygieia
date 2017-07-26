@@ -84,7 +84,8 @@
 						return;
 					}
 				}
-
+				console.log("The repopass is: "+ ctrl.repopass);
+				console.log("The widget option password is: "+ widgetConfig.options.password);
 				if (ctrl.repopass) {
 					if (ctrl.repopass === widgetConfig.options.password) {
 						//password is unchanged in the form so don't encrypt it again
